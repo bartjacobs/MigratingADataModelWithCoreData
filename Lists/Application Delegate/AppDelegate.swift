@@ -24,6 +24,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Seed Persistent Store
         seedPersistentStoreWithManagedObjectContext(managedObjectContext)
         
+        // Create Fetch Request
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Item")
+
+        // Add Sort Descriptor
+        let sortDescriptor = NSSortDescriptor(key: "name", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+
+        // Add Predicate
+        let predicate1 = NSPredicate(format: "completed = 1")
+        let predicate2 = NSPredicate(format: "%K = %@", "list.name", "Home")
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate1, predicate2])
+
+        do {
+            let records = try managedObjectContext.fetch(fetchRequest) as! [NSManagedObject]
+
+            for record in records {
+                print(record.value(forKey: "name") ?? "no name")
+            }
+            
+        } catch {
+            print(error)
+        }
+
         return true
     }
 
