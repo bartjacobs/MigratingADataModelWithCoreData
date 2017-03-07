@@ -45,6 +45,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
             let items = list.mutableSetValue(forKey: "items")
 
+            if let anyItem = items.anyObject() as? NSManagedObject {
+                managedObjectContext.delete(anyItem)
+            } else {
+                managedObjectContext.delete(list)
+            }
+
+            /*
             // Create Item Record
             if let item = createRecordForEntity("Item", inManagedObjectContext: managedObjectContext) {
                 // Set Attributes
@@ -57,6 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 // Add Item to Items
                 items.add(item)
             }
+            */
 
             print("number of items: \(items.count)")
             print("---")
