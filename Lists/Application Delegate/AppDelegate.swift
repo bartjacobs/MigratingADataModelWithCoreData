@@ -35,9 +35,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("--")
 
         if let list = list {
-            print(list.value(forKey: "name") ?? "no name")
-            print(list.value(forKey: "createdAt") ?? "no creation date")
-
             if list.value(forKey: "name") == nil {
                 list.setValue("Shopping List", forKey: "name")
             }
@@ -45,6 +42,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if list.value(forKey: "createdAt") == nil {
                 list.setValue(Date(), forKey: "createdAt")
             }
+
+            let items = list.mutableSetValue(forKey: "items")
+
+            // Create Item Record
+            if let item = createRecordForEntity("Item", inManagedObjectContext: managedObjectContext) {
+                // Set Attributes
+                item.setValue("Item \(items.count + 1)", forKey: "name")
+                item.setValue(Date(), forKey: "createdAt")
+
+                // Set Relationship
+                item.setValue(list, forKey: "list")
+
+                // Add Item to Items
+                items.add(item)
+            }
+
+            print("number of items: \(items.count)")
+            print("---")
+            
+            for itemRecord in items {
+                print((itemRecord as AnyObject).value(forKey: "name") ?? "no name")
+            }
+            
         } else {
             print("unable to fetch or create list")
         }
