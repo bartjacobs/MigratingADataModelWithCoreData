@@ -35,9 +35,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("--")
 
         if let list = list {
-            print(list)
             print(list.value(forKey: "name") ?? "no name")
-            print(list)
+            print(list.value(forKey: "createdAt") ?? "no creation date")
+
+            if list.value(forKey: "name") == nil {
+                list.setValue("Shopping List", forKey: "name")
+            }
+
+            if list.value(forKey: "createdAt") == nil {
+                list.setValue(Date(), forKey: "createdAt")
+            }
         } else {
             print("unable to fetch or create list")
         }
