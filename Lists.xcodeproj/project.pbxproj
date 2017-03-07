@@ -12,6 +12,7 @@
 		CCB5BD051E6E997700A4D20B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CCB5BCFD1E6E997700A4D20B /* Main.storyboard */; };
 		CCB5BD061E6E997700A4D20B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCB5BCFF1E6E997700A4D20B /* ViewController.swift */; };
 		CCB5BD071E6E997700A4D20B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CCB5BD011E6E997700A4D20B /* Assets.xcassets */; };
+		CCB5BD0A1E6E9A0600A4D20B /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCB5BD091E6E9A0600A4D20B /* CoreDataManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		CCB5BCFD1E6E997700A4D20B /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		CCB5BCFF1E6E997700A4D20B /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		CCB5BD011E6E997700A4D20B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CCB5BD091E6E9A0600A4D20B /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +60,7 @@
 				CCB5BCFE1E6E997700A4D20B /* View Controllers */,
 				CCB5BCFB1E6E997700A4D20B /* Storyboards */,
 				CCB5BD001E6E997700A4D20B /* Resources */,
+				CCB5BD081E6E99ED00A4D20B /* Managers */,
 				CCB5BCF91E6E997700A4D20B /* Supporting Files */,
 			);
 			path = Lists;
@@ -102,6 +105,14 @@
 				CCB5BD011E6E997700A4D20B /* Assets.xcassets */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		CCB5BD081E6E99ED00A4D20B /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				CCB5BD091E6E9A0600A4D20B /* CoreDataManager.swift */,
+			);
+			path = Managers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -177,6 +188,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CCB5BD0A1E6E9A0600A4D20B /* CoreDataManager.swift in Sources */,
 				CCB5BD061E6E997700A4D20B /* ViewController.swift in Sources */,
 				CCB5BD021E6E997700A4D20B /* AppDelegate.swift in Sources */,
 			);
