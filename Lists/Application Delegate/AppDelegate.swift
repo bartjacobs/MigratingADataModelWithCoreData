@@ -14,76 +14,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
+    let didSeedPersistentStore = "didSeedPersistentStore"
+
     let coreDataManager = CoreDataManager(modelName: "Lists")
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         let managedObjectContext = coreDataManager.managedObjectContext
 
-        // Helpers
-        var list: NSManagedObject? = nil
-
-        // Fetch List Records
-        let lists = fetchRecordsForEntity("List", inManagedObjectContext: managedObjectContext)
-
-        if let listRecord = lists.first {
-            list = listRecord
-        } else if let listRecord = createRecordForEntity("List", inManagedObjectContext: managedObjectContext) {
-            list = listRecord
-        }
-
-        print("number of lists: \(lists.count)")
-        print("--")
-
-        if let list = list {
-            if list.value(forKey: "name") == nil {
-                list.setValue("Shopping List", forKey: "name")
-            }
-
-            if list.value(forKey: "createdAt") == nil {
-                list.setValue(Date(), forKey: "createdAt")
-            }
-
-            let items = list.mutableSetValue(forKey: "items")
-
-            if let anyItem = items.anyObject() as? NSManagedObject {
-                managedObjectContext.delete(anyItem)
-            } else {
-                managedObjectContext.delete(list)
-            }
-
-            /*
-            // Create Item Record
-            if let item = createRecordForEntity("Item", inManagedObjectContext: managedObjectContext) {
-                // Set Attributes
-                item.setValue("Item \(items.count + 1)", forKey: "name")
-                item.setValue(Date(), forKey: "createdAt")
-
-                // Set Relationship
-                item.setValue(list, forKey: "list")
-
-                // Add Item to Items
-                items.add(item)
-            }
-            */
-
-            print("number of items: \(items.count)")
-            print("---")
-            
-            for itemRecord in items {
-                print((itemRecord as AnyObject).value(forKey: "name") ?? "no name")
-            }
-            
-        } else {
-            print("unable to fetch or create list")
-        }
-
-        do {
-            // Save Managed Object Context
-            try managedObjectContext.save()
-            
-        } catch {
-            print("Unable to save managed object context.")
-        }
+        // Seed Persistent Store
+        seedPersistentStoreWithManagedObjectContext(managedObjectContext)
         
         return true
     }
@@ -145,6 +84,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         return result
+    }
+
+    private func seedPersistentStoreWithManagedObjectContext(_ managedObjectContext: NSManagedObjectContext) {
+        guard !UserDefaults.standard.bool(forKey: didSeedPersistentStore) else { return }
+
+        let listNames = ["Home", "Work", "Leisure"]
+
+        for listName in listNames {
+            // Create List
+            if let list = createRecordForEntity("List", inManagedObjectContext: managedObjectContext) {
+                // Populate List
+                list.setValue(listName, forKey: "name")
+                list.setValue(Date(), forKey: "createdAt")
+
+                // Add Items
+                for i in 1...10 {
+                    // Create Item
+                    if let item = createRecordForEntity("Item", inManagedObjectContext: managedObjectContext) {
+                        // Set Attributes
+                        item.setValue("Item \(i)", forKey: "name")
+                        item.setValue(Date(), forKey: "createdAt")
+                        item.setValue(NSNumber(value: (i % 3 == 0)), forKey: "completed")
+
+                        // Set List Relationship
+                        item.setValue(list, forKey: "list")
+                    }
+                }
+            }
+        }
+        
+        do {
+            // Save Managed Object Context
+            try managedObjectContext.save()
+
+        } catch {
+            print("Unable to save managed object context.")
+        }
+
+        // Update User Defaults
+        UserDefaults.standard.set(true, forKey: didSeedPersistentStore)
     }
 
 }
