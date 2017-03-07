@@ -357,7 +357,7 @@
 				CCECA92E1E6F471F00C02364 /* Lists 2.xcdatamodel */,
 				CCB5BD0D1E6E9B3500A4D20B /* Lists.xcdatamodel */,
 			);
-			currentVersion = CCB5BD0D1E6E9B3500A4D20B /* Lists.xcdatamodel */;
+			currentVersion = CCECA92E1E6F471F00C02364 /* Lists 2.xcdatamodel */;
 			path = Lists.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
