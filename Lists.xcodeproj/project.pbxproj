@@ -26,6 +26,7 @@
 		CCB5BD011E6E997700A4D20B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CCB5BD091E6E9A0600A4D20B /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		CCB5BD0D1E6E9B3500A4D20B /* Lists.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Lists.xcdatamodel; sourceTree = "<group>"; };
+		CCECA92E1E6F471F00C02364 /* Lists 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Lists 2.xcdatamodel"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -345,6 +346,7 @@
 				CCB5BCF51E6E990E00A4D20B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
@@ -352,6 +354,7 @@
 		CCB5BD0C1E6E9B3500A4D20B /* Lists.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				CCECA92E1E6F471F00C02364 /* Lists 2.xcdatamodel */,
 				CCB5BD0D1E6E9B3500A4D20B /* Lists.xcdatamodel */,
 			);
 			currentVersion = CCB5BD0D1E6E9B3500A4D20B /* Lists.xcdatamodel */;
