@@ -14,9 +14,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
+    let coreDataManager = CoreDataManager(modelName: "Lists")
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        let coreDataManager = CoreDataManager(modelName: "Lists")
-        print(coreDataManager.managedObjectContext)
+        let managedObjectContext = coreDataManager.managedObjectContext
+
+        // Create Entity Description
+        let entityDescription = NSEntityDescription.entity(forEntityName: "List", in: managedObjectContext)
+
+        if let entityDescription = entityDescription {
+            // Create Managed Object
+            let list = NSManagedObject(entity: entityDescription, insertInto: managedObjectContext)
+
+            print(list)
+
+            do {
+                // Save Changes
+                try managedObjectContext.save()
+                
+            } catch {
+                // Error Handling
+            }
+        }
+
         return true
     }
 
