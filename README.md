@@ -1,99 +1,52 @@
-### [More Fetching and Deleting Managed Objects With Core Data](https://cocoacasts.com/more-fetching-and-deleting-managed-objects-with-core-data/)
+### [Migrating a Data Model With Core Data](https://cocoacasts.com/migrating-a-data-model-with-core-data/)
 
 #### Author: Bart Jacobs
 
-The final piece of the [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) puzzle covers deleting records from a persistent store. I can assure you that deleting records is no rocket science.
+An application that grows and gains features also gains new requirements. The data model, for example, grows and changes. Core Data handles changes pretty well as long as you play by the rules of the framework.
 
-We also take a closer look at the `NSFetchRequest` class. In the [previous tutorial](https://cocoacasts.com/reading-and-updating-managed-objects-with-core-data/), we used this class to fetch the records of an entity. But `NSFetchRequest` has a lot more to offer.
+In this tutorial, we take a look at how Core Data helps us manage changes of the data model and what pitfalls we absolutely need to avoid.
 
-If you want to follow along, download or clone the project we created in the [previous tutorial](https://cocoacasts.com/reading-and-updating-managed-objects-with-core-data/) from [GitHub](https://github.com/bartjacobs/ReadingAndUpdatingManagedObjectsWithCoreData) and fire up Xcode.
+## Modifying the Data Model
 
-## How to Delete a Record From a Persistent Store
-
-Remember from the [previous tutorial](https://cocoacasts.com/reading-and-updating-managed-objects-with-core-data/) that an item record is added to the list record every time the application is run. Add several item records to the list record by running the application a few times. This is what you should see in the console:
+[Download or clone the project](https://github.com/bartjacobs/MoreFetchingAndDeletingManagedObjects) we created in the [previous tutorial](https://cocoacasts.com/more-fetching-and-deleting-managed-objects-with-core-data/) and open it in Xcode. Run the application in the simulator or on a physical device to make sure everything is set up correctly.
 
 ```bash
-number of lists: 1
---
-number of items: 10
----
-Item 9
-Item 3
-Item 10
-Item 4
-Item 5
-Item 6
-Item 7
-Item 1
-Item 8
-Item 2
+git clone https://github.com/bartjacobs/MoreFetchingAndDeletingManagedObjects
 ```
 
-Deleting a record from a persistent store involves three steps:
+Open the project's data model by selecting **Lists.xcdatamodeld** in the **Project Navigator**. Add an entity to the data model and name it **User**. Add two attributes to the **User** entity:
 
-- fetch the record that needs to be deleted
-- mark the record for deletion
-- save the changes
+- `firstName` of type `String`
+- `lastName` of type `String`
 
-To show you how to delete a record, we delete an item record from the list record every time the application is run. If the list record has no item records left, we delete the list record itself.
+Add a relationship, `lists`, to the **User** entity and set its destination to the **List** entity. In the **Data Model Inspector**, set **Type** to **To Many**.
 
-Since we are focusing on deleting items, you can remove or comment out the code we added to `application(_:didFinishLaunchingWithOptions:)` to add new item records.
+Select the **List** entity and create a **To One** relationship with the **User** entity as its destination. Name the relationship `user` and set the inverse relationship to `lists`. Remember that the inverse relationship of the `lists` relationship is automatically set for us by Core Data. This is what the data model now looks like.
 
-### Deleting an Item Record
+![Migrating a Data Model With Core Data | Updating the Data Model](https://cocoacasts.s3.amazonaws.com/migrating-a-data-model-with-core-data/figure-modify-data-model-1.jpg)
 
-Remember that we obtained the list's item records by invoking `mutableSetValue(forKey:)`. It returns a mutable set (`NSMutableSet`) of `NSManagedObject` instances. We can obtain a random item record by invoking `anyObject()` on the mutable set.
+It's time to verify that everything is still working. Run the application in the simulator or on a physical device. Ouch. Did that crash take you by surprise? That's what happens if you mess with the data model without telling Core Data about it.
 
-```swift
-let items = list.mutableSetValue(forKey: "items")
+In this tutorial, we find out what happened, how we can prevent it, and how we can modify the data model without running into a crash.
 
-if let anyItem = items.anyObject() as? NSManagedObject {
-    print(anyItem.value(forKey: "name") ?? "no name")
-}
-```
+## Finding the Root Cause
 
-If you run the application, the name of a random item record is printed to the console. To delete the item record, we invoke `delete(_:)` on the managed object context the item record belongs to, passing in the item record as an argument. Remember that every managed object is tied to a managed object context.
+Finding out the cause of the crash is easy. Open **CoreDataManager.swift** and inspect the implementation of the `persistentStoreCoordinator` property. If adding the persistent store to the persistent store coordinator fails, the application invokes the `fatalError()` function, which causes the application to terminate immediately.
 
-```swift
-let items = list.mutableSetValue(forKey: "items")
+![Migrating a Data Model With Core Data | Terminating the Application](https://cocoacasts.s3.amazonaws.com/migrating-a-data-model-with-core-data/figure-core-data-abort-1.jpg)
 
-if let anyItem = items.anyObject() as? NSManagedObject {
-    managedObjectContext.delete(anyItem)
-}
-```
-
-Every time you run the application, a random item record is deleted from the persistent store.
+The goal of this tutorial is to prevent that adding the persistent store to the persistent store coordinator fails. Run the application again and inspect the output in the console. The following line tells us what went wrong.
 
 ```bash
-number of lists: 1
---
-number of items: 5
----
-Item 8
-Item 9
-Item 7
-Item 2
-Item 10
+reason = "The model used to open the store is incompatible with the one used to create the store";
 ```
 
-### Deleting a List Record
+We are closing in on the root of the problem. Core Data tells us that the data model is not compatible with the data model we used to create the persistent store. What does that mean? When you downloaded or cloned the project from GitHub, I asked you to run the application to make sure everything was set up correctly. By running the application for the first time, Core Data automatically created a persistent store based on the data model of the project.
 
-If no item records are left, we delete the list record to which the item records belonged.
+We then modified the data model by creating the **User** entity and defining several attributes and relationships. With the new data model in place, we ran the application again. And you know what happened next.
 
-```swift
-let items = list.mutableSetValue(forKey: "items")
+Before a persistent store is added to the persistent store coordinator, Core Data checks if a persistent store already exists. If it finds one, Core Data makes sure the data model is compatible with the persistent store. How this works becomes clear in a moment.
 
-if let anyItem = items.anyObject() as? NSManagedObject {
-    managedObjectContext.delete(anyItem)
-} else {
-    managedObjectContext.delete(list)
-}
-```
+The error message in the console indicates that the data model that was used to create the persistent store is not identical to the current data model. As a result, Core Data bails out and throws an error. Read this paragraph again. It is important that you understand the root cause of the problem.
 
-```bash
-number of lists: 1
---
-number of items: 0
----
-```
-
-**Read this article on [Cocoacasts](https://cocoacasts.com/more-fetching-and-deleting-managed-objects-with-core-data/)**.
+**Read this article on [Cocoacasts](https://cocoacasts.com/migrating-a-data-model-with-core-data/)**.
