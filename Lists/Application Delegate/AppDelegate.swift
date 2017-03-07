@@ -19,24 +19,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         let managedObjectContext = coreDataManager.managedObjectContext
 
-        // Create Entity Description
-        let entityDescription = NSEntityDescription.entity(forEntityName: "List", in: managedObjectContext)
+        // Helpers
+        var list: NSManagedObject? = nil
 
-        if let entityDescription = entityDescription {
-            // Create Managed Object
-            let list = NSManagedObject(entity: entityDescription, insertInto: managedObjectContext)
+        // Fetch List Records
+        let lists = fetchRecordsForEntity("List", inManagedObjectContext: managedObjectContext)
 
-            print(list)
-
-            do {
-                // Save Changes
-                try managedObjectContext.save()
-                
-            } catch {
-                // Error Handling
-            }
+        if let listRecord = lists.first {
+            list = listRecord
+        } else if let listRecord = createRecordForEntity("List", inManagedObjectContext: managedObjectContext) {
+            list = listRecord
         }
 
+        print("number of lists: \(lists.count)")
+        print("--")
+
+        if let list = list {
+            print(list)
+            print(list.value(forKey: "name") ?? "no name")
+            print(list)
+        } else {
+            print("unable to fetch or create list")
+        }
+
+        do {
+            // Save Managed Object Context
+            try managedObjectContext.save()
+            
+        } catch {
+            print("Unable to save managed object context.")
+        }
+        
         return true
     }
 
@@ -58,6 +71,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
 
+    }
+
+    // MARK: - Helper Methods
+
+    private func createRecordForEntity(_ entity: String, inManagedObjectContext managedObjectContext: NSManagedObjectContext) -> NSManagedObject? {
+        // Helpers
+        var result: NSManagedObject?
+
+        // Create Entity Description
+        let entityDescription = NSEntityDescription.entity(forEntityName: entity, in: managedObjectContext)
+
+        if let entityDescription = entityDescription {
+            // Create Managed Object
+            result = NSManagedObject(entity: entityDescription, insertInto: managedObjectContext)
+        }
+        
+        return result
+    }
+
+    private func fetchRecordsForEntity(_ entity: String, inManagedObjectContext managedObjectContext: NSManagedObjectContext) -> [NSManagedObject] {
+        // Create Fetch Request
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
+
+        // Helpers
+        var result = [NSManagedObject]()
+
+        do {
+            // Execute Fetch Request
+            let records = try managedObjectContext.fetch(fetchRequest)
+
+            if let records = records as? [NSManagedObject] {
+                result = records
+            }
+
+        } catch {
+            print("Unable to fetch managed objects for entity \(entity).")
+        }
+        
+        return result
     }
 
 }
